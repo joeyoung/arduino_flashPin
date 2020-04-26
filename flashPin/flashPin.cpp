@@ -6,6 +6,7 @@
 //          Jan 15/14 - use i/o wrapper functions pin_mode, pin_write
 //          Jan 16/14 - fp_set function added
 //          Apr 24/20 - version 1.0.1 - Library formatting
+//          Apr 25/20 - version 1.1.0 - flashRep added
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -30,6 +31,9 @@
 		fdur = duration;
 		fstate = restLevel;
 		frest = restLevel;
+		frep = 0;
+		fon = false;
+		ftiming = false;
 		pin_mode( fpin, OUTPUT );
 		pin_write( fpin, frest );
 	} // flashPin constructor
@@ -46,6 +50,7 @@
 		pin_write( fpin, !frest );
 		fstate = !fstate;
 		fdur = duratn;			// reset default duration 
+		fon	= true;			// indicate on timing
 		fmark = millis( );		// setup flashOff with end time
 	} // flash
 
@@ -53,14 +58,35 @@
 	void flashPin::flash( ) {
 		pin_write( fpin, !frest );
 		fstate = !fstate;
+		fon	= true;			// indicate on timing
 		fmark = millis( );	// setup flashOff with constructed end time
 	} // flash
 
+// flashRep - flash repeat 
+	void flashPin::flashRep( char repeats ) {
+		frep = repeats;
+		if( ftiming ) return;
+		flash( );
+		ftiming = true;
+	} // flashRep
+
 // flashOff - call at loop rate to find time to turn off pin
 	void flashPin::flashOff( ) {
-		if( fstate == frest ) return;	// quick exit if already off
-		if( millis( ) - fmark > fdur ) {
+		if( fstate == frest && frep == 0 ) return;	// quick exit if off and finished repeats
+		if( fon && millis( ) - fmark > fdur ) {
 			pin_write( fpin, frest );
 			fstate = frest;
+			fon = false;
+			if( frep > 0 ) fmark = millis( );		// setup OFF timing if repeats pending
 		} // if timeup
+		if( !fon && frep > 0 && millis( ) - fmark > fdur ) {
+			frep--;
+			if( frep > 0 ) {
+				flash( );
+			} else {
+				ftiming = false;
+			}
+		}
 	} // flashOff
+
+

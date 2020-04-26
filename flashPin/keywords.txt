@@ -20,6 +20,7 @@ flashPin	KEYWORD1
 ###########################################
 
 flash	KEYWORD2
+flashRep	KEYWORD2
 flashOff	KEYWORD2
 fp_set	KEYWORD2
 

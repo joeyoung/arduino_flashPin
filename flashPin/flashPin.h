@@ -6,6 +6,7 @@
 //          Jan 15/14 - virtual functions for i/o
 //          Jan 16/14 - fp_set function added
 //          Apr 24/20 - version 1.0.1 - Library formatting
+//          Apr 25/20 - version 1.1.0 - flashRep added
 //
 //    This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -40,6 +41,7 @@ public:
 	//member functions
 	void flash( unsigned long duration );
 	void flash( );
+	void flashRep( char repeats );
 	void fp_set( bool restLevel );
 
 	void flashOff( );
@@ -48,6 +50,9 @@ private:
 	byte fpin;
 	bool fstate;
 	bool frest;
+	bool fon;
+	bool ftiming;
+	char frep;
 	unsigned long fmark, fdur;
 
 }; // class flashPin
